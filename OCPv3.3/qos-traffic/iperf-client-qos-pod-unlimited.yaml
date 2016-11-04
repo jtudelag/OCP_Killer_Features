@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iperf-client-qos-unlimited
+  labels:
+    name: "iperf-client-qos-unlimited"
+spec:
+  containers:
+  - name: "iperf-client-qos-unlimited"
+    image: jtudela/net-utils
+    command: ["/usr/bin/iperf","-u","-f","K","-p","5001","-n","1M","-c","192.168.1.6"]

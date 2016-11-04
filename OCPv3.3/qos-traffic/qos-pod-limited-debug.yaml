@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qos-limited-debug
+  annotations:
+    kubernetes.io/ingress-bandwidth: "1M"
+    kubernetes.io/egress-bandwidth: "1M"
+  labels:
+    name: "qos-limited-debug"
+spec:
+  containers:
+  - name: "qos-limitedi-debug"
+    image: jtudela/net-utils
+    command: ["/usr/bin/sleep","10000"]
+  restartPolicy: Never

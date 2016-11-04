@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iperf-server-qos-limited
+  annotations:
+    kubernetes.io/ingress-bandwidth: "1M"
+    kubernetes.io/egress-bandwidth: "1M"
+  labels:
+    name: "iperf-server-qos-limited"
+spec:
+  containers:
+  - name: "iperf-server-qos-limited"
+    image: jtudela/net-utils
+    command: ["/usr/bin/iperf","-u","-f","K","-p","5001","-s"]
+  restartPolicy: Never
