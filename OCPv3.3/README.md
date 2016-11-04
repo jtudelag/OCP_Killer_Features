@@ -9,14 +9,52 @@ In order to be able to follow these examples, you need an OCP 3.3 environment wi
 so unfortunately development environments such as minishift, CDK or 'oc cluster up' are not valid.
 
 
-## Egress Router 
+## [Egress Router](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-limit-pod-access-egress-router)
 
-## Egress Firewall 
+## [Egress Firewall](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-limit-pod-access-egress)
+Cluster admins can now limit the addresses that some or all pods can access from within the cluster.
+
+OCP uses EgressNetworkPolicies to achieve this. NetworkPolicyObjects are project scoped, so all the pods of a project are affected by them.
+Multiple EgressNetworkPolicies can be created by project.In case of rule collision, rules are checked in order, and the first one that matches is enforced.
+Only IPs can be used to define the rules (URLs are not valid).
+
+To test this new functionality, inside the folder qos-traffic you can find an EgressNetworkPolicy and a POD .yaml files.
+
+First of all, go to one of the OCP instance, a master for example,(reachabale from inside POD) and run a simple web server inside a folder with files.
+Also, note the IP of the instance
+
+
+```
+python -mSimpleHTTPServer 8080
+ip a
+```
+
+Now creates the POD, and rsh into it to test the connectivity to the web server:
+```
+oc create -f debug-egress-firewall.yaml 
+oc rsh debug-egress-firewall
+curl http://<web server ip>:8080
+```
+
+Now edit the file egress-network-policy.json and change the "Deny cidrSelector" with the IP 
+of the instance where the web server is running. 
+
+Then create the EgressNetworkPolic and rsh into the pod again to test if the connectivity to web server is still possible:
+
+
+```
+oc create -f egress-network-policy.json
+oc rsh debug-egress-firewall
+curl http://<web server ip>:8080
+```
+
+The same can be tested the opposite way, just create an EgressNetworkPolicy that Deny to 0.0.0.0 and Allow to an specific ip.
 
 ## [QOS traffic shaping](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-manage-pods-limit-bandwidth)
+We can now limit the bandwith of a POD, both the ingress and the egress.
 
 To test this new functionality, inside the folder qos-traffic you can find a bunch of pod definition .yaml files.
-Some of them are bandwidth limited wo we can test the feature.
+Some of them are bandwidth limited so we can test the feature.
 
 Some of them launch a pod using iperf tool:
 
@@ -29,9 +67,10 @@ The others just run a sleep command because the main prupose is to be able to rs
 * qos-pod-limited-debug.yaml
 * qos-pod-unlimited-debug.yaml
 
-These last two pods wiil be used to test this feature.
+These last two pods will be used to test this feature.
 
-First, we create the pods, keep in mind that qos-pod-limited-debug.yaml has the bandwidth annotations, while qos-pod-unlimited-debug.yaml has no bandwidth limitations:
+First, we create the pods, keep in mind that qos-pod-limited-debug.yaml has the bandwidth annotations, 
+wile qos-pod-unlimited-debug.yaml has no bandwidth limitations:
 
 ```
 oc create -f qos-pod-limited-debug.yaml
@@ -165,3 +204,4 @@ curl "http://$route/timeout/7"
 <b>Timeout set to: 7</b>!
 ``` 
 
+## [Idling PODs](https://docs.openshift.com/container-platform/3.3/release_notes/ocp_3_3_release_notes.html#ocp-33-idling-unidling)

@@ -1,0 +1,13 @@
+---
+kind: EgressNetworkPolicy
+apiVersion: v1
+metadata:
+  name: egress-net-policy-allow-internallip
+spec:
+  egress:
+  - type: Allow
+    to:
+      cidrSelector: 0.0.0.0/32
+  - type: Deny
+    to:
+      cidrSelector: 192.168.1.6/32

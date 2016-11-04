@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-egress-firewall
+  labels:
+    name: "debug-egress-firewall"
+spec:
+  containers:
+  - name: "debug-egress-firewall"
+    image: jtudela/net-utils
+    command: ["/usr/bin/sleep","10000"]
+  restartPolicy: Never
