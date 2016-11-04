@@ -9,12 +9,11 @@ In order to be able to follow these examples, you need an OCP 3.3 environment wi
 so unfortunately development environments such as minishift, CDK or 'oc cluster up' are not valid.
 
 
-# Egress Router #
+## Egress Router 
 
-# Egress Firewall #
+## Egress Firewall 
 
-# QOS traffic shaping #
-[QOS traffic shaping](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-manage-pods-limit-bandwidth)
+## [QOS traffic shaping](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-manage-pods-limit-bandwidth)
 
 To test this new functionality, inside the folder qos-traffic you can find a bunch of pod definition .yaml files.
 Some of them are bandwidth limited wo we can test the feature.
@@ -119,3 +118,50 @@ Limited upload to 1M (Dowload file inside a POD, from master):
                                  Dload  Upload   Total   Spent    Left  Speed
 100 16.4M  100 16.4M    0     0   125k      0  0:02:14  0:02:14 --:--:--  120k
 ```
+
+## [Configuring route timeouts](https://docs.openshift.com/container-platform/3.3/install_config/configuring_routing.html#install-config-configuring-route-timeouts)
+
+We can now set specific timeouts per route, instead of having one unique timeout per router :).
+This allow OCP users to controll in a very fine graned way the timeout of their apps.
+
+The mechanism is very simple, we have to annotate our route with the desired timeout, and thats it.
+This can be done when creating the route, by seting the annottation, or overriding an already 
+created route.
+
+[Route-specific timeouts](https://docs.openshift.com/container-platform/3.3/architecture/core_concepts/routes.html#route-specific-timeouts)
+
+In order to test this feature, we are going to use a simple python app, that allow us to change the
+number of seconds the app will wait before answering, so we can play with this value and seehow the
+route behaves.
+
+Execute the following commands from a Master node:
+
+```
+oc new-app https://github.com/jtudelag/python-variable-timeout
+oc expose svc python-variable-timeout
+```
+Wait some seconds till the POD is running:
+
+```
+route=$(oc describe route python-variable-timeout | grep Requested | awk '{print $3 }')
+curl "http://$route/hello"
+```
+
+As you can see, It takes 5second before it responds. No we are going to annotate our route to 4s timeout. 
+And see what happens.
+
+``` 
+oc annotate route python-variable-timeout --overwrite haproxy.router.opensfhit.io/timeout=4s
+
+curl "http://$route/hello"
+<html><body><h1>504 Gateway Time-out</h1>
+The server didn't respond in time.
+</body></html>
+```
+
+You can play with the python app changing the reponse time just by calling it like this:
+``` 
+curl "http://$route/timeout/7"
+<b>Timeout set to: 7</b>!
+``` 
+
