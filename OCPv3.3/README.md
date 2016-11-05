@@ -14,7 +14,7 @@ so unfortunately development environments such as minishift, CDK or 'oc cluster 
 ## [Egress Firewall](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-limit-pod-access-egress)
 Cluster admins can now limit the addresses that some or all pods can access from within the cluster.
 
-OCP uses EgressNetworkPolicies to achieve this. NetworkPolicyObjects are project scoped, so all the pods of a project are affected by them.
+OCP uses EgressNetworkPolicies to achieve this. NetworkPolicy objects are project scoped, so all the pods of a project are affected by them.
 Multiple EgressNetworkPolicies can be created by project.In case of rule collision, rules are checked in order, and the first one that matches is enforced.
 Only IPs can be used to define the rules (URLs are not valid).
 
@@ -23,7 +23,6 @@ To test this new functionality, inside the folder qos-traffic you can find an Eg
 First of all, go to one of the OCP instance, a master for example,(reachabale from inside POD) and run a simple web server inside a folder with files.
 Also, note the IP of the instance
 
-
 ```
 python -mSimpleHTTPServer 8080
 ip a
@@ -31,6 +30,7 @@ ip a
 
 Now creates the POD, and rsh into it to test the connectivity to the web server:
 ```
+oc new-project egress-firewall
 oc create -f debug-egress-firewall.yaml 
 oc rsh debug-egress-firewall
 curl http://<web server ip>:8080
@@ -73,6 +73,7 @@ First, we create the pods, keep in mind that qos-pod-limited-debug.yaml has the 
 wile qos-pod-unlimited-debug.yaml has no bandwidth limitations:
 
 ```
+oc new-project qos-traffic
 oc create -f qos-pod-limited-debug.yaml
 oc create -f qos-pod-unlimited-debug.yaml
 
@@ -176,6 +177,7 @@ route behaves.
 Execute the following commands from a Master node:
 
 ```
+oc new-project route-timeouts
 oc new-app https://github.com/jtudelag/python-variable-timeout
 oc expose svc python-variable-timeout
 ```
