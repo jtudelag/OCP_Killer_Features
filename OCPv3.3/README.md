@@ -104,7 +104,7 @@ curl -o /tmp/t.zip 'https://releases.hashicorp.com/terraform/0.7.8/terraform_0.7
 ```
 
 Now, we want to test the upload speed (egress bandwidth), so we are going to serve the terrafom binary 
-we just download through a simple HTTP server. 
+we just downloade through a simple HTTP server. 
 
 ```
 cd /tmp
@@ -118,7 +118,7 @@ From one of the masters for example:
 ```
 ip=$(oc describe pod iperf-qos-unlimited-debug | grep IP | awk '{print $2}')
 
-curl "http://$ip:8080/t.zip -o /tmp/t.zip
+curl "http://$ip:8080/t.zip" -o /tmp/t.zip
 
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -164,7 +164,7 @@ Limited upload to 1M (Dowload file inside a POD, from master):
 ## [Configuring route timeouts](https://docs.openshift.com/container-platform/3.3/install_config/configuring_routing.html#install-config-configuring-route-timeouts)
 
 We can now set specific timeouts per route, instead of having one unique timeout per router :).
-This allow OCP users to controll in a very fine graned way the timeout of their apps.
+This allow OCP users to controll in a very fine grained way, the timeout of their apps.
 
 The mechanism is very simple, we have to annotate our route with the desired timeout, and thats it.
 This can be done when creating the route, by seting the annottation, or overriding an already 
@@ -173,7 +173,7 @@ created route.
 [Route-specific timeouts](https://docs.openshift.com/container-platform/3.3/architecture/core_concepts/routes.html#route-specific-timeouts)
 
 In order to test this feature, we are going to use a simple python app, that allow us to change the
-number of seconds the app will wait before answering, so we can play with this value and seehow the
+number of seconds the app will wait before answering, so we can play with this value and see how the
 route behaves.
 
 Execute the following commands from a Master node:
@@ -190,7 +190,7 @@ route=$(oc describe route python-variable-timeout | grep Requested | awk '{print
 curl "http://$route/hello"
 ```
 
-As you can see, It takes 5second before it responds. No we are going to annotate our route to 4s timeout. 
+As you can see, It takes 5 second before it responds. Now we are going to annotate our route to 4s timeout. 
 And see what happens.
 
 ``` 
@@ -226,7 +226,7 @@ oc new-app https://github.com/jtudelag/python-variable-timeout
 ```
 
 Inside the folder [`route-multiple-backends`](route-multiple-backends) you can find a .yaml file with a route definition, have a look a it.
-Once created, from a master, curl several times to the route, and see what happens.
+Once created, from a Master, curl several times to the route, and see what happens.
 
 ```
 cd route-multiple-backends/
@@ -247,13 +247,13 @@ We can now use Docker seccomp profiles in Openshif to filter out the syscalls co
 * Openshift allows to set a default custom seccomp profile(different from the Docker default profile), by editing the restricted SCC.
 * Openshift allows to set individual seccomp profiles per pod via  annotations.
 
-To test this feature, we asume you have already followed the documentation and have a environment with seccomp profiles configured.
+To test this feature, we assume you have already followed the documentation and have a environment with seccomp profiles configured.
 
 NOTE:
 **Make sure you configure seccomp profiles in every node of your cluster, no matter if is a master, a infra or a node.** 
 
-In the folder [`seccomp-profiles`](seccomp-profiles) you can find the profile mkdir.json,that blocks the syscall mkdir. 
-You should place it in the seccomp root folder of your cluster (In every node).
+Insid the folder [`seccomp-profiles`](seccomp-profiles) you can find the profile mkdir.json,that blocks mkdir syscall. 
+You should place it in the seccomp root folder( defined in the node-config.yaml) of your cluster (In every node).
 
 Also two .yaml files with POD definitions, one annotated to use the mkdir.json profile.
 
@@ -281,7 +281,7 @@ The resoruces are scaled down to zero replicas. Upon receiving network traffic, 
 
 Keep in mind that resources are "scaled down to zero replicas", and not paused. It means that if you have a POD,
 the pod will need to start again from scratch before being able to accept connections. 
-Use it at your own risk in case your POD takes awhile before fully starting... 
+Use it at your own risk in case your POD takes a while before fully starting... 
 
 We deploy hello-openshift app and expose it through a route.
 ```
