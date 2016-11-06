@@ -11,6 +11,8 @@ so unfortunately development environments such as minishift, CDK or 'oc cluster 
 
 ## [Egress Router](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-limit-pod-access-egress-router)
 
+TBD...
+
 ## [Egress Firewall](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-limit-pod-access-egress)
 Cluster admins can now limit the addresses that some or all pods can access from within the cluster.
 
@@ -251,7 +253,8 @@ NOTE:
 **Make sure you configure seccomp profiles in every node of your cluster, no matter if is a master, a infra or a node.** 
 
 In the folder [`seccomp-profiles`](seccomp-profiles) you can find the profile mkdir.json,that blocks the syscall mkdir. 
-You should place in the seccomp root folder of your cluster (In every node),
+You should place it in the seccomp root folder of your cluster (In every node).
+
 Also two .yaml files with POD definitions, one annotated to use the mkdir.json profile.
 
 ```
@@ -271,4 +274,36 @@ sh-4.2# mkdir tmp-dir
 ```
 
 
-## [Idling PODs](https://docs.openshift.com/container-platform/3.3/release_notes/ocp_3_3_release_notes.html#ocp-33-idling-unidling)
+## [Idling Resources](https://docs.openshift.com/container-platform/3.3/release_notes/ocp_3_3_release_notes.html#ocp-33-idling-unidling)
+
+This new feature allows to idle scalable resources (such as deployment configs and replication controllers).
+The resoruces are scaled down to zero replicas. Upon receiving network traffic, the services (and any associated routes) will "wake up" the resources by scaling them back up to their previous scale.
+
+Keep in mind that resources are "scaled down to zero replicas", and not paused. It means that if you have a POD,
+the pod will need to start again from scratch before being able to accept connections. 
+Use it at your own risk in case your POD takes awhile before fully starting... 
+
+We deploy hello-openshift app and expose it through a route.
+```
+oc new-project idle-resources
+oc new-app openshift/hello-openshift
+oc expose svc hello-openshift
+
+oc get pod
+curl http://hello-openshift-idle-resources.router.default.svc.cluster.local
+```
+
+We idle it, and check that PODs are scaled down to zero, there is no POD.
+```
+oc idle hello-openshift
+oc get pod
+```
+
+But if we hit the route, the POD is autoscaled again to its previous state, 1 replica.
+Notice that It takes a few seconds before answering.
+```
+curl http://hello-openshift-idle-resources.router.default.svc.cluster.local
+oc get pod
+```
+
+  
