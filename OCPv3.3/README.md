@@ -18,7 +18,7 @@ OCP uses EgressNetworkPolicies to achieve this. NetworkPolicy objects are projec
 Multiple EgressNetworkPolicies can be created by project.In case of rule collision, rules are checked in order, and the first one that matches is enforced.
 Only IPs can be used to define the rules (URLs are not valid).
 
-To test this new functionality, inside the folder qos-traffic you can find an EgressNetworkPolicy and a POD .yaml files.
+To test this new functionality, inside the folder [`egress-firewall`](egress-firewall) you can find an EgressNetworkPolicy and a POD .yaml files.
 
 First of all, go to one of the OCP instance, a master for example,(reachabale from inside POD) and run a simple web server inside a folder with files.
 Also, note the IP of the instance
@@ -53,7 +53,7 @@ The same can be tested the opposite way, just create an EgressNetworkPolicy that
 ## [QOS traffic shaping](https://docs.openshift.com/container-platform/3.3/admin_guide/managing_pods.html#admin-guide-manage-pods-limit-bandwidth)
 We can now limit the bandwith of a POD, both the ingress and the egress.
 
-To test this new functionality, inside the folder qos-traffic you can find a bunch of pod definition .yaml files.
+To test this new functionality, inside the folder [`qos-traffic`](qos-traffic) you can find a bunch of pod definition .yaml files.
 Some of them are bandwidth limited so we can test the feature.
 
 Some of them launch a pod using iperf tool:
@@ -223,7 +223,7 @@ oc new-app openshift/hello-openshift
 oc new-app https://github.com/jtudelag/python-variable-timeout
 ```
 
-Inside the route-multiple-backends you can find a .yaml file with a route definition, have a look a it.
+Inside the folder [`route-multiple-backends`](route-multiple-backends) you can find a .yaml file with a route definition, have a look a it.
 Once created, from a master, curl several times to the route, and see what happens.
 
 ```
@@ -239,6 +239,7 @@ curl http://weight-route-things.router.default.svc.cluster.local
 ## [Seccomp](https://docs.openshift.com/container-platform/3.3/admin_guide/seccomp.html)
 
 [Docker seccomp docs](https://docs.docker.com/engine/security/seccomp/)
+
 We can now use Docker seccomp profiles in Openshif to filter out the syscalls containers can make.
 
 * Openshift allows to set a default custom seccomp profile(different from the Docker default profile), by editing the restricted SCC.
@@ -246,7 +247,10 @@ We can now use Docker seccomp profiles in Openshif to filter out the syscalls co
 
 To test this feature, we asume you have already followed the documentation and have a environment with seccomp profiles configured.
 
-In the folder seccomp-profiles you can find the profile mkdir.json,that blocks the syscall mkdir. 
+NOTE:
+**Make sure you configure seccomp profiles in every node of your cluster, no matter if is a master, a infra or a node.** 
+
+In the folder [`seccomp-profiles`](seccomp-profiles) you can find the profile mkdir.json,that blocks the syscall mkdir. 
 You should place in the seccomp root folder of your cluster (In every node),
 Also two .yaml files with POD definitions, one annotated to use the mkdir.json profile.
 
