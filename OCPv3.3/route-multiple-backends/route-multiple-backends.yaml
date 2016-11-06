@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Route
+metadata:
+  name: weight-route
+  labels:
+    app: weight-route
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
+spec:
+  host: weight-route-things.router.default.svc.cluster.local
+  to:
+    name: hello-openshift
+    kind: Service
+    weight: 50
+  alternateBackends:
+  - name: python-variable-timeout
+    kind: Service
+    weight: 50
+  ports:
+  - targetPort: 8080

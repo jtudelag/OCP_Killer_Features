@@ -206,4 +206,34 @@ curl "http://$route/timeout/7"
 <b>Timeout set to: 7</b>!
 ``` 
 
+## [Routes with multiple backends](https://docs.openshift.com/container-platform/3.3/dev_guide/routes.html#routes-load-balancing-for-AB-testing)
+Routes can now have more than one service backend, making it easier to perform A/B testing. 
+Each route can now have multiple services assigned to it, and those services can come from different applications or pods.
+
+This is done by using the field alternateBackends. 
+Besides that, every service backend can have a weigh that sets the % of traffic that will be sent to that service.
+
+To try this feature, we just need to run two different applications that listen on the same port,
+and create a route with this two apps as backend, and give them a weigh.
+
+
+``` 
+oc new-project route-multiple-backend
+oc new-app openshift/hello-openshift
+oc new-app https://github.com/jtudelag/python-variable-timeout
+```
+
+Inside the route-multiple-backends you can find a .yaml file with a route definition, have a look a it.
+Once created, from a master, curl several times to the route, and see what happens.
+
+```
+cd route-multiple-backends/
+oc create -f route-multiple-backends.yaml
+curl http://weight-route-things.router.default.svc.cluster.local
+curl http://weight-route-things.router.default.svc.cluster.local
+curl http://weight-route-things.router.default.svc.cluster.local
+...
+
+```
+
 ## [Idling PODs](https://docs.openshift.com/container-platform/3.3/release_notes/ocp_3_3_release_notes.html#ocp-33-idling-unidling)
