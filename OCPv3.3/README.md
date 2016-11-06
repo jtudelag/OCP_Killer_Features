@@ -236,4 +236,35 @@ curl http://weight-route-things.router.default.svc.cluster.local
 
 ```
 
+## [Seccomp](https://docs.openshift.com/container-platform/3.3/admin_guide/seccomp.html)
+
+[Docker seccomp docs](https://docs.docker.com/engine/security/seccomp/)
+We can now use Docker seccomp profiles in Openshif to filter out the syscalls containers can make.
+
+* Openshift allows to set a default custom seccomp profile(different from the Docker default profile), by editing the restricted SCC.
+* Openshift allows to set individual seccomp profiles per pod via  annotations.
+
+To test this feature, we asume you have already followed the documentation and have a environment with seccomp profiles configured.
+
+In the folder seccomp-profiles you can find the profile mkdir.json,that blocks the syscall mkdir. 
+You should place in the seccomp root folder of your cluster (In every node),
+Also two .yaml files with POD definitions, one annotated to use the mkdir.json profile.
+
+```
+oc new-project seccomp-profiles
+oc create -f pod-no-seccomp-profile.yaml
+oc create -f pod-mkdir-seccomp-profile.yaml
+```
+
+Now, log into both PODs, try to execute the command mkdir and see what happens.
+```
+oc rsh mkdir-seccomp-profile
+sh-4.2# mkdir temp-dir
+mkdir: cannot create directory 'temp-dir': Operation not permitted
+
+oc rsh no-seccomp-profiles
+sh-4.2# mkdir tmp-dir
+```
+
+
 ## [Idling PODs](https://docs.openshift.com/container-platform/3.3/release_notes/ocp_3_3_release_notes.html#ocp-33-idling-unidling)

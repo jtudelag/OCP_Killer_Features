@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-seccomp-profiles
+  labels:
+    name: "no-seccomp-profile"
+spec:
+  containers:
+  - name: "no-seccomp-profile"
+    image: jtudela/net-utils
+    command: ["/usr/bin/sleep","10000"]
+  restartPolicy: Never
