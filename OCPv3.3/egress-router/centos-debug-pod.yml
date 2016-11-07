@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: centos-debug
+  labels:
+    name: "centos-debug"
+spec:
+  containers:
+  - name: "centos-debug"
+    image: centos:7
+    command: ["/usr/bin/sleep", "100000"]
+    securityContext:
+      privileged: true
+    
