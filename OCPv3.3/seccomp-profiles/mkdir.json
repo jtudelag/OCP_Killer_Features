@@ -1,5 +1,5 @@
 {
-  "defaultAction": "SCPM_ACT_ALLOW",
+  "defaultAction": "SCMP_ACT_ALLOW",
   "syscalls": [
     {
       "name": "mkdir",
